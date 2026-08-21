@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Prediction</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+
+<i class="fa-solid fa-truck-fast"></i>
+
+<h2>AI Route</h2>
+
+</div>
+
+<ul>
+
+<li>
+<a href="/">
+<i class="fa-solid fa-house"></i>
+Dashboard
+</a>
+</li>
+
+<li>
+<a href="/upload">
+<i class="fa-solid fa-upload"></i>
+Upload Dataset
+</a>
+</li>
+
+<li>
+<a href="/optimize">
+<i class="fa-solid fa-route"></i>
+Route Optimization
+</a>
+</li>
+
+<li class="active">
+<a href="/prediction">
+<i class="fa-solid fa-brain"></i>
+AI Prediction
+</a>
+</li>
+
+<li>
+<a href="/report">
+<i class="fa-solid fa-chart-column"></i>
+Reports
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+
+<div>
+
+<h1>AI Prediction</h1>
+
+<p>Machine Learning Prediction Results</p>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<i class="fa-solid fa-clock"></i>
+
+<h2 id="predictionTime">0 min</h2>
+
+<p>Predicted Time</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-car"></i>
+
+<h2 id="traffic">Low</h2>
+
+<p>Traffic</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-cloud"></i>
+
+<h2 id="weather">Sunny</h2>
+
+<p>Weather</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-chart-line"></i>
+
+<h2 id="accuracy">0%</h2>
+
+<p>Model Accuracy</p>
+
+</div>
+
+</div>
+
+<div class="content">
+
+<div class="left">
+
+<h2>Prediction Summary</h2>
+
+<p>
+
+The AI model predicts delivery time by analyzing distance,
+traffic conditions and weather.
+
+</p>
+
+<button class="btn" id="predictBtn">
+
+Run Prediction
+
+</button>
+
+</div>
+
+<div class="right">
+
+<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=900"
+alt="AI">
+
+</div>
+
+</div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

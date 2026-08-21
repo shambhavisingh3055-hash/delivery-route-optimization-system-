@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reports</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+
+<i class="fa-solid fa-truck-fast"></i>
+
+<h2>AI Route</h2>
+
+</div>
+
+<ul>
+
+<li>
+
+<a href="/">
+
+<i class="fa-solid fa-house"></i>
+
+Dashboard
+
+</a>
+
+</li>
+
+<li>
+
+<a href="/upload">
+
+<i class="fa-solid fa-upload"></i>
+
+Upload Dataset
+
+</a>
+
+</li>
+
+<li>
+
+<a href="/optimize">
+
+<i class="fa-solid fa-route"></i>
+
+Route Optimization
+
+</a>
+
+</li>
+
+<li>
+
+<a href="/prediction">
+
+<i class="fa-solid fa-brain"></i>
+
+AI Prediction
+
+</a>
+
+</li>
+
+<li class="active">
+
+<a href="/report">
+
+<i class="fa-solid fa-chart-column"></i>
+
+Reports
+
+</a>
+
+</li>
+
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+
+<div>
+
+<h1>Analytics & Reports</h1>
+
+<p>AI Delivery Performance Report</p>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<i class="fa-solid fa-truck"></i>
+
+<h2>150</h2>
+
+<p>Total Deliveries</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-road"></i>
+
+<h2>380 km</h2>
+
+<p>Total Distance</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-clock"></i>
+
+<h2>18 hrs</h2>
+
+<p>Total Delivery Time</p>
+
+</div>
+
+<div class="card">
+
+<i class="fa-solid fa-gas-pump"></i>
+
+<h2>78 L</h2>
+
+<p>Fuel Saved</p>
+
+</div>
+
+</div>
+
+<div class="content">
+
+<div class="left">
+
+<h2>Delivery Performance</h2>
+
+<canvas id="deliveryChart"></canvas>
+
+</div>
+
+<div class="right">
+
+<h2>AI Summary</h2>
+
+<p>
+
+✔ Route Optimized Successfully
+
+<br><br>
+
+✔ Delivery Time Reduced
+
+<br><br>
+
+✔ Fuel Consumption Reduced
+
+<br><br>
+
+✔ AI Prediction Accuracy : 96%
+
+</p>
+
+<br>
+
+<button class="btn">
+
+Export Report
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

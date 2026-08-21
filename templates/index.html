@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI/ML Delivery Route Optimization</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            <h2>AI Route</h2>
+
+        </div>
+
+        <ul>
+
+            <li class="active">
+                <a href="/">
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/upload">
+                    <i class="fa-solid fa-upload"></i>
+                    Upload Dataset
+                </a>
+            </li>
+
+            <li>
+                <a href="/optimize">
+                    <i class="fa-solid fa-route"></i>
+                    Route Optimization
+                </a>
+            </li>
+
+            <li>
+                <a href="/prediction">
+                    <i class="fa-solid fa-brain"></i>
+                    AI Prediction
+                </a>
+            </li>
+
+            <li>
+                <a href="/report">
+                    <i class="fa-solid fa-chart-column"></i>
+                    Reports
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main -->
+
+    <div class="main">
+
+        <!-- Header -->
+
+        <div class="header">
+
+            <div>
+
+                <h1>AI/ML Delivery Route Optimization System</h1>
+
+                <p>Intelligent Route Planning Using Artificial Intelligence</p>
+
+            </div>
+
+            <button class="profile">
+
+                <i class="fa-solid fa-user"></i>
+
+                Admin
+
+            </button>
+
+        </div>
+
+        <!-- Cards -->
+
+        <div class="cards">
+
+            <div class="card">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <h2>0</h2>
+
+                <p>Total Deliveries</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-road"></i>
+
+                <h2>0 km</h2>
+
+                <p>Optimized Distance</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-clock"></i>
+
+                <h2>0 min</h2>
+
+                <p>Estimated Time</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-gas-pump"></i>
+
+                <h2>0 L</h2>
+
+                <p>Fuel Saved</p>
+
+            </div>
+
+        </div>
+
+        <!-- Overview -->
+
+        <div class="content">
+
+            <div class="left">
+
+                <h2>Project Overview</h2>
+
+                <p>
+
+                    This AI-powered system optimizes delivery routes using Machine
+                    Learning algorithms. It minimizes travel distance, predicts
+                    delivery time, and improves delivery efficiency.
+
+                </p>
+
+                <button class="btn">
+
+                    Optimize Route
+
+                </button>
+
+            </div>
+
+            <div class="right">
+
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700"
+                    alt="AI">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

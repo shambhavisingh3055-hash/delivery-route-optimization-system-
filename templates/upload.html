@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Dataset</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            <h2>AI Route</h2>
+
+        </div>
+
+        <ul>
+
+            <li>
+                <a href="/">
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="active">
+                <a href="/upload">
+                    <i class="fa-solid fa-upload"></i>
+                    Upload Dataset
+                </a>
+            </li>
+
+            <li>
+                <a href="/optimize">
+                    <i class="fa-solid fa-route"></i>
+                    Route Optimization
+                </a>
+            </li>
+
+            <li>
+                <a href="/prediction">
+                    <i class="fa-solid fa-brain"></i>
+                    AI Prediction
+                </a>
+            </li>
+
+            <li>
+                <a href="/report">
+                    <i class="fa-solid fa-chart-column"></i>
+                    Reports
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main -->
+
+    <div class="main">
+
+        <div class="header">
+
+            <div>
+
+                <h1>Upload Delivery Dataset</h1>
+
+                <p>Select a CSV file containing delivery information.</p>
+
+            </div>
+
+        </div>
+
+        <div class="upload-container">
+
+            <div class="upload-box">
+
+                <i class="fa-solid fa-file-csv"></i>
+
+                <h2>Choose CSV File</h2>
+
+                <p>Upload your delivery dataset for AI analysis.</p>
+
+                <input type="file" id="csvFile" accept=".csv" hidden>
+
+                <button class="btn" onclick="document.getElementById('csvFile').click()">
+
+                    Select CSV
+
+                </button>
+
+                <p id="fileName" style="margin-top:20px;color:#2563eb;font-weight:600;"></p>
+
+            </div>
+
+        </div>
+
+        <div class="content" style="margin-top:35px;">
+
+            <div class="left">
+
+                <h2>Dataset Requirements</h2>
+
+                <ul style="line-height:2; color:#64748b;">
+
+                    <li>Customer Name</li>
+
+                    <li>Latitude</li>
+
+                    <li>Longitude</li>
+
+                    <li>Traffic Level</li>
+
+                    <li>Weather</li>
+
+                    <li>Delivery Time</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

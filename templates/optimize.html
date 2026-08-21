@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Route Optimization</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            <h2>AI Route</h2>
+
+        </div>
+
+        <ul>
+
+            <li>
+                <a href="/">
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/upload">
+                    <i class="fa-solid fa-upload"></i>
+                    Upload Dataset
+                </a>
+            </li>
+
+            <li class="active">
+                <a href="/optimize">
+                    <i class="fa-solid fa-route"></i>
+                    Route Optimization
+                </a>
+            </li>
+
+            <li>
+                <a href="/prediction">
+                    <i class="fa-solid fa-brain"></i>
+                    AI Prediction
+                </a>
+            </li>
+
+            <li>
+                <a href="/report">
+                    <i class="fa-solid fa-chart-column"></i>
+                    Reports
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main -->
+
+    <div class="main">
+
+        <div class="header">
+
+            <div>
+
+                <h1>Route Optimization</h1>
+
+                <p>Generate the shortest delivery route using AI.</p>
+
+            </div>
+
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <h2 id="stops">0</h2>
+
+                <p>Delivery Stops</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-road"></i>
+
+                <h2 id="distance">0 km</h2>
+
+                <p>Total Distance</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-clock"></i>
+
+                <h2 id="time">0 min</h2>
+
+                <p>Estimated Time</p>
+
+            </div>
+
+        </div>
+
+        <div class="content">
+
+            <div class="left">
+
+                <h2>Optimized Route</h2>
+
+                <table class="route-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Stop</th>
+
+                            <th>Customer</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>1</td>
+                            <td>Warehouse</td>
+                            <td>Start</td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>Customer A</td>
+                            <td>Pending</td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+                            <td>Customer B</td>
+                            <td>Pending</td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+                            <td>Customer C</td>
+                            <td>Pending</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+                <br>
+
+                <button class="btn" id="optimizeBtn">
+
+                    Optimize Route
+
+                </button>
+
+            </div>
+
+            <div class="right">
+
+                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700"
+                    alt="Route">
+
+            </div>
+
+        </div>
+
+    </div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
