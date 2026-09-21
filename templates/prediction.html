@@ -19,150 +19,333 @@
 
 </head>
 
+
 <body>
+
+
+<!-- ================= SIDEBAR ================= -->
 
 <div class="sidebar">
 
-<div class="logo">
+    <div class="logo">
 
-<i class="fa-solid fa-truck-fast"></i>
+        <i class="fa-solid fa-truck-fast"></i>
 
-<h2>AI Route</h2>
+        <h2>AI Route</h2>
+
+    </div>
+
+
+    <ul>
+
+        <li>
+            <a href="/">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+        </li>
+
+
+        <li>
+            <a href="/upload">
+                <i class="fa-solid fa-upload"></i>
+                Upload Dataset
+            </a>
+        </li>
+
+
+        <li>
+            <a href="/optimize">
+                <i class="fa-solid fa-route"></i>
+                Route Optimization
+            </a>
+        </li>
+
+
+        <li class="active">
+            <a href="/prediction">
+                <i class="fa-solid fa-brain"></i>
+                AI Prediction
+            </a>
+        </li>
+
+
+        <li>
+            <a href="/report">
+                <i class="fa-solid fa-chart-column"></i>
+                Reports
+            </a>
+        </li>
+
+    </ul>
 
 </div>
 
-<ul>
 
-<li>
-<a href="/">
-<i class="fa-solid fa-house"></i>
-Dashboard
-</a>
-</li>
 
-<li>
-<a href="/upload">
-<i class="fa-solid fa-upload"></i>
-Upload Dataset
-</a>
-</li>
-
-<li>
-<a href="/optimize">
-<i class="fa-solid fa-route"></i>
-Route Optimization
-</a>
-</li>
-
-<li class="active">
-<a href="/prediction">
-<i class="fa-solid fa-brain"></i>
-AI Prediction
-</a>
-</li>
-
-<li>
-<a href="/report">
-<i class="fa-solid fa-chart-column"></i>
-Reports
-</a>
-</li>
-
-</ul>
-
-</div>
+<!-- ================= MAIN ================= -->
 
 <div class="main">
 
-<div class="header">
 
-<div>
+    <!-- ================= HEADER ================= -->
 
-<h1>AI Prediction</h1>
+    <div class="header">
 
-<p>Machine Learning Prediction Results</p>
+        <div>
+
+            <h1>AI Prediction</h1>
+
+            <p>
+                Predict delivery time using machine learning.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= RESULT CARDS ================= -->
+
+    <div class="cards">
+
+
+        <!-- Predicted Time -->
+
+        <div class="card">
+
+            <i class="fa-solid fa-clock"></i>
+
+            <h2 id="predictionTime">
+                0 min
+            </h2>
+
+            <p>
+                Predicted Time
+            </p>
+
+        </div>
+
+
+        <!-- Traffic -->
+
+        <div class="card">
+
+            <i class="fa-solid fa-car"></i>
+
+            <h2 id="traffic">
+                -
+            </h2>
+
+            <p>
+                Traffic
+            </p>
+
+        </div>
+
+
+        <!-- Weather -->
+
+        <div class="card">
+
+            <i class="fa-solid fa-cloud"></i>
+
+            <h2 id="weather">
+                -
+            </h2>
+
+            <p>
+                Weather
+            </p>
+
+        </div>
+
+
+        <!-- Model Performance -->
+
+        <div class="card">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            <h2 id="accuracy">
+                R² 0.84
+            </h2>
+
+            <p>
+                Model R² Score
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= CONTENT ================= -->
+
+    <div class="content">
+
+
+        <!-- ================= LEFT ================= -->
+
+        <div class="left">
+
+            <h2>
+                Delivery Time Prediction
+            </h2>
+
+
+            <p>
+
+                Enter the delivery conditions below.
+                The trained Random Forest model will
+                predict the expected delivery time.
+
+            </p>
+
+
+            <br>
+
+
+            <!-- DISTANCE -->
+
+            <div class="input-group">
+
+                <label for="distanceInput">
+                    Distance (km)
+                </label>
+
+                <input
+                    type="number"
+                    id="distanceInput"
+                    placeholder="Example: 8.5"
+                    step="0.1"
+                    min="0"
+                >
+
+            </div>
+
+
+            <br>
+
+
+            <!-- TRAFFIC -->
+
+            <div class="input-group">
+
+                <label for="trafficInput">
+                    Traffic Condition
+                </label>
+
+                <select id="trafficInput">
+
+                    <option value="">
+                        Select Traffic
+                    </option>
+
+                    <option value="Low">
+                        Low
+                    </option>
+
+                    <option value="Medium">
+                        Medium
+                    </option>
+
+                    <option value="High">
+                        High
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <br>
+
+
+            <!-- WEATHER -->
+
+            <div class="input-group">
+
+                <label for="weatherInput">
+                    Weather Condition
+                </label>
+
+                <select id="weatherInput">
+
+                    <option value="">
+                        Select Weather
+                    </option>
+
+                    <option value="Sunny">
+                        Sunny
+                    </option>
+
+                    <option value="Cloudy">
+                        Cloudy
+                    </option>
+
+                    <option value="Rainy">
+                        Rainy
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <br>
+
+
+            <!-- PREDICT BUTTON -->
+
+            <button
+                class="btn"
+                id="predictBtn">
+
+                <i class="fa-solid fa-brain"></i>
+
+                Run Prediction
+
+            </button>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="predictionError"
+                class="error-message"
+                style="display:none; margin-top:20px;">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= RIGHT ================= -->
+
+        <div class="right">
+
+            <img
+                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=900"
+                alt="AI Prediction">
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
-</div>
 
-<div class="cards">
 
-<div class="card">
-
-<i class="fa-solid fa-clock"></i>
-
-<h2 id="predictionTime">0 min</h2>
-
-<p>Predicted Time</p>
-
-</div>
-
-<div class="card">
-
-<i class="fa-solid fa-car"></i>
-
-<h2 id="traffic">Low</h2>
-
-<p>Traffic</p>
-
-</div>
-
-<div class="card">
-
-<i class="fa-solid fa-cloud"></i>
-
-<h2 id="weather">Sunny</h2>
-
-<p>Weather</p>
-
-</div>
-
-<div class="card">
-
-<i class="fa-solid fa-chart-line"></i>
-
-<h2 id="accuracy">0%</h2>
-
-<p>Model Accuracy</p>
-
-</div>
-
-</div>
-
-<div class="content">
-
-<div class="left">
-
-<h2>Prediction Summary</h2>
-
-<p>
-
-The AI model predicts delivery time by analyzing distance,
-traffic conditions and weather.
-
-</p>
-
-<button class="btn" id="predictBtn">
-
-Run Prediction
-
-</button>
-
-</div>
-
-<div class="right">
-
-<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=900"
-alt="AI">
-
-</div>
-
-</div>
-
-</div>
+<!-- ================= JAVASCRIPT ================= -->
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 
 </body>
 

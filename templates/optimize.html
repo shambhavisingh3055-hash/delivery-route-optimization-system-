@@ -19,9 +19,11 @@
 
 </head>
 
+
 <body>
 
-    <!-- Sidebar -->
+
+    <!-- ================= SIDEBAR ================= -->
 
     <div class="sidebar">
 
@@ -33,50 +35,85 @@
 
         </div>
 
+
         <ul>
 
             <li>
+
                 <a href="/">
+
                     <i class="fa-solid fa-house"></i>
+
                     Dashboard
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="/upload">
+
                     <i class="fa-solid fa-upload"></i>
+
                     Upload Dataset
+
                 </a>
+
             </li>
+
 
             <li class="active">
+
                 <a href="/optimize">
+
                     <i class="fa-solid fa-route"></i>
+
                     Route Optimization
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="/prediction">
+
                     <i class="fa-solid fa-brain"></i>
+
                     AI Prediction
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="/report">
+
                     <i class="fa-solid fa-chart-column"></i>
+
                     Reports
+
                 </a>
+
             </li>
 
         </ul>
 
     </div>
 
-    <!-- Main -->
+
+
+    <!-- ================= MAIN CONTENT ================= -->
 
     <div class="main">
+
+
+        <!-- ================= HEADER ================= -->
 
         <div class="header">
 
@@ -84,120 +121,173 @@
 
                 <h1>Route Optimization</h1>
 
-                <p>Generate the shortest delivery route using AI.</p>
+                <p>
+                    Generate an optimized delivery route using
+                    geographic distance analysis.
+                </p>
 
             </div>
 
         </div>
 
+
+
+        <!-- ================= STATISTICS CARDS ================= -->
+
         <div class="cards">
+
+
+            <!-- Delivery Stops -->
 
             <div class="card">
 
                 <i class="fa-solid fa-location-dot"></i>
 
-                <h2 id="stops">0</h2>
+                <h2 id="stops">
+                    0
+                </h2>
 
-                <p>Delivery Stops</p>
+                <p>
+                    Delivery Stops
+                </p>
 
             </div>
+
+
+
+            <!-- Total Distance -->
 
             <div class="card">
 
                 <i class="fa-solid fa-road"></i>
 
-                <h2 id="distance">0 km</h2>
+                <h2 id="distance">
+                    0 km
+                </h2>
 
-                <p>Total Distance</p>
+                <p>
+                    Total Distance
+                </p>
 
             </div>
+
+
+
+            <!-- Estimated Time -->
 
             <div class="card">
 
                 <i class="fa-solid fa-clock"></i>
 
-                <h2 id="time">0 min</h2>
+                <h2 id="time">
+                    0 min
+                </h2>
 
-                <p>Estimated Time</p>
+                <p>
+                    Estimated Time
+                </p>
 
             </div>
 
         </div>
 
+
+
+        <!-- ================= ERROR MESSAGE ================= -->
+
+        <div class="error-message"
+             style="display:none;">
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+        </div>
+
+
+
+        <!-- ================= CONTENT ================= -->
+
         <div class="content">
+
+
+            <!-- ================= LEFT SIDE ================= -->
 
             <div class="left">
 
-                <h2>Optimized Route</h2>
+                <h2>
+                    Optimized Route
+                </h2>
 
-                <table class="route-table">
 
-                    <thead>
 
-                        <tr>
+                <!-- IMPORTANT:
+                     JavaScript will insert the
+                     optimized route table here.
+                -->
 
-                            <th>Stop</th>
+                <div class="table-container">
 
-                            <th>Customer</th>
+                    <div class="empty-route">
 
-                            <th>Status</th>
+                        <i class="fa-solid fa-route"></i>
 
-                        </tr>
+                        <h3>
+                            No Optimized Route Yet
+                        </h3>
 
-                    </thead>
+                        <p>
+                            Upload a delivery dataset and
+                            click the button below to generate
+                            an optimized route.
+                        </p>
 
-                    <tbody>
+                    </div>
 
-                        <tr>
-                            <td>1</td>
-                            <td>Warehouse</td>
-                            <td>Start</td>
-                        </tr>
+                </div>
 
-                        <tr>
-                            <td>2</td>
-                            <td>Customer A</td>
-                            <td>Pending</td>
-                        </tr>
 
-                        <tr>
-                            <td>3</td>
-                            <td>Customer B</td>
-                            <td>Pending</td>
-                        </tr>
-
-                        <tr>
-                            <td>4</td>
-                            <td>Customer C</td>
-                            <td>Pending</td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
 
                 <br>
 
-                <button class="btn" id="optimizeBtn">
+
+
+                <!-- ================= OPTIMIZE BUTTON ================= -->
+
+                <button class="btn"
+                        id="optimizeBtn">
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
 
                     Optimize Route
 
                 </button>
 
+
             </div>
+
+
+
+            <!-- ================= RIGHT SIDE ================= -->
 
             <div class="right">
 
-                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700"
-                    alt="Route">
+                <img
+                    src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700"
+                    alt="Route Optimization">
 
             </div>
 
+
         </div>
+
 
     </div>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 
 </body>
 

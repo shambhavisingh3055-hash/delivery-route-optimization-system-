@@ -1,272 +1,1174 @@
-// ===============================
-// AI Route Dashboard Script
-// ===============================
+// ==========================================================
+// AI ROUTE - MAIN JAVASCRIPT
+// ==========================================================
 
-// Animate dashboard numbers
-function animateValue(element, start, end, duration, suffix = "") {
+document.addEventListener("DOMContentLoaded", function () {
 
-    let startTime = null;
 
-    function animation(currentTime) {
+    // ======================================================
+    // GREETING
+    // ======================================================
 
-        if (!startTime) startTime = currentTime;
+    const headerTitle = document.querySelector(".header h1");
 
-        const progress = Math.min((currentTime - startTime) / duration, 1);
+    if (
+        headerTitle &&
+        window.location.pathname === "/"
+    ) {
 
-        const value = Math.floor(progress * (end - start) + start);
+        const hour = new Date().getHours();
 
-        element.innerHTML = value + suffix;
+        let greeting = "Welcome";
 
-        if (progress < 1) {
-            requestAnimationFrame(animation);
+        if (hour < 12) {
+
+            greeting = "Good Morning 👋";
+
+        }
+        else if (hour < 17) {
+
+            greeting = "Good Afternoon ☀";
+
+        }
+        else {
+
+            greeting = "Good Evening 🌙";
+
+        }
+
+        headerTitle.innerHTML =
+            greeting +
+            "<br>AI/ML Delivery Route Optimization System";
+
+    }
+
+
+    // ======================================================
+    // CARD HOVER EFFECT
+    // ======================================================
+
+    const cards = document.querySelectorAll(".card");
+
+    cards.forEach(function (card) {
+
+        card.addEventListener("mouseenter", function () {
+
+            card.style.transform =
+                "translateY(-10px) scale(1.03)";
+
+        });
+
+
+        card.addEventListener("mouseleave", function () {
+
+            card.style.transform =
+                "translateY(0px) scale(1)";
+
+        });
+
+    });
+
+
+    // ======================================================
+    // UPLOAD DATASET
+    // ======================================================
+
+    const csvFile =
+        document.getElementById("csvFile");
+
+
+    if (csvFile) {
+
+        csvFile.addEventListener(
+            "change",
+            function () {
+
+                const file = this.files[0];
+
+                if (file) {
+
+                    const fileName =
+                        document.getElementById("fileName");
+
+
+                    if (fileName) {
+
+                        fileName.innerHTML =
+                            "Selected File : " +
+                            file.name +
+                            " ✅";
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ======================================================
+    // ROUTE OPTIMIZATION
+    // ======================================================
+
+    const optimizeBtn =
+        document.getElementById("optimizeBtn");
+
+
+    if (optimizeBtn) {
+
+        optimizeBtn.addEventListener(
+            "click",
+            async function () {
+
+                optimizeBtn.disabled = true;
+
+                optimizeBtn.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Optimizing...';
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/api/optimize",
+                            {
+                                method: "POST"
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data.message ||
+                            "Route optimization failed."
+                        );
+
+                    }
+
+
+                    // ==============================
+                    // UPDATE STOPS
+                    // ==============================
+
+                    const stops =
+                        document.getElementById("stops");
+
+
+                    if (stops) {
+
+                        stops.innerHTML =
+                            data.total_deliveries ?? 0;
+
+                    }
+
+
+                    // ==============================
+                    // UPDATE DISTANCE
+                    // ==============================
+
+                    const distance =
+                        document.getElementById("distance");
+
+
+                    if (distance) {
+
+                        const totalDistance =
+                            Number(
+                                data.total_distance_km || 0
+                            );
+
+
+                        distance.innerHTML =
+                            totalDistance.toFixed(2) +
+                            " km";
+
+                    }
+
+
+                    // ==============================
+                    // CALCULATE DELIVERY TIME
+                    // ==============================
+
+                    let totalTime = 0;
+
+
+                    if (
+                        Array.isArray(data.route)
+                    ) {
+
+                        data.route.forEach(
+                            function (delivery) {
+
+                                totalTime +=
+                                    Number(
+                                        delivery.delivery_time_min || 0
+                                    );
+
+                            }
+                        );
+
+                    }
+
+
+                    const time =
+                        document.getElementById("time");
+
+
+                    if (time) {
+
+                        time.innerHTML =
+                            Math.round(totalTime) +
+                            " min";
+
+                    }
+
+
+                    // ==============================
+                    // DISPLAY ROUTE TABLE
+                    // ==============================
+
+                    displayRouteTable(
+                        data.route
+                    );
+
+
+                    // ==============================
+                    // SUCCESS BUTTON
+                    // ==============================
+
+                    optimizeBtn.innerHTML =
+                        '<i class="fa-solid fa-check"></i> Route Optimized';
+
+
+                    optimizeBtn.style.background =
+                        "#16a34a";
+
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Optimization Error:",
+                        error
+                    );
+
+
+                    showOptimizationError(
+                        error.message
+                    );
+
+
+                    optimizeBtn.innerHTML =
+                        '<i class="fa-solid fa-wand-magic-sparkles"></i> Optimize Route';
+
+
+                    optimizeBtn.disabled = false;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ======================================================
+    // AI PREDICTION
+    // ======================================================
+
+    const predictBtn =
+        document.getElementById("predictBtn");
+
+
+    if (predictBtn) {
+
+        predictBtn.addEventListener(
+            "click",
+            async function () {
+
+
+                // ==============================
+                // GET INPUT ELEMENTS
+                // ==============================
+
+                const distanceInput =
+                    document.getElementById(
+                        "distanceInput"
+                    );
+
+
+                const trafficInput =
+                    document.getElementById(
+                        "trafficInput"
+                    );
+
+
+                const weatherInput =
+                    document.getElementById(
+                        "weatherInput"
+                    );
+
+
+                const predictionTime =
+                    document.getElementById(
+                        "predictionTime"
+                    );
+
+
+                const traffic =
+                    document.getElementById(
+                        "traffic"
+                    );
+
+
+                const weather =
+                    document.getElementById(
+                        "weather"
+                    );
+
+
+                const errorBox =
+                    document.getElementById(
+                        "predictionError"
+                    );
+
+
+                // ==============================
+                // GET VALUES
+                // ==============================
+
+                const distance =
+                    distanceInput
+                        ? distanceInput.value.trim()
+                        : "";
+
+
+                const trafficValue =
+                    trafficInput
+                        ? trafficInput.value
+                        : "";
+
+
+                const weatherValue =
+                    weatherInput
+                        ? weatherInput.value
+                        : "";
+
+
+                // ==============================
+                // VALIDATION
+                // ==============================
+
+                if (
+                    distance === "" ||
+                    trafficValue === "" ||
+                    weatherValue === ""
+                ) {
+
+                    if (errorBox) {
+
+                        errorBox.innerHTML =
+                            '<i class="fa-solid fa-circle-exclamation"></i> Please enter distance and select traffic and weather conditions.';
+
+                        errorBox.style.display =
+                            "block";
+
+                    }
+
+                    return;
+
+                }
+
+
+                // Hide previous error
+
+                if (errorBox) {
+
+                    errorBox.style.display =
+                        "none";
+
+                }
+
+
+                // ==============================
+                // BUTTON LOADING
+                // ==============================
+
+                predictBtn.disabled = true;
+
+                predictBtn.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Predicting...';
+
+
+                try {
+
+
+                    // ==========================
+                    // SEND DATA TO FLASK
+                    // ==========================
+
+                    const response =
+                        await fetch(
+                            "/api/predict",
+                            {
+
+                                method: "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body: JSON.stringify({
+
+                                    distance_km:
+                                        Number(distance),
+
+                                    traffic:
+                                        trafficValue,
+
+                                    weather:
+                                        weatherValue
+
+                                })
+
+                            }
+                        );
+
+
+                    // ==========================
+                    // GET RESPONSE
+                    // ==========================
+
+                    const data =
+                        await response.json();
+
+
+                    // ==========================
+                    // CHECK ERROR
+                    // ==========================
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data.message ||
+                            "Prediction failed."
+                        );
+
+                    }
+
+
+                    // ==========================
+                    // DISPLAY PREDICTION
+                    // ==========================
+
+                    if (predictionTime) {
+
+                        predictionTime.innerHTML =
+                            Number(
+                                data.predicted_time_min
+                            ).toFixed(2) +
+                            " min";
+
+                    }
+
+
+                    // ==========================
+                    // DISPLAY TRAFFIC
+                    // ==========================
+
+                    if (traffic) {
+
+                        traffic.innerHTML =
+                            data.traffic;
+
+                    }
+
+
+                    // ==========================
+                    // DISPLAY WEATHER
+                    // ==========================
+
+                    if (weather) {
+
+                        weather.innerHTML =
+                            data.weather;
+
+                    }
+
+
+                    // ==========================
+                    // SUCCESS BUTTON
+                    // ==========================
+
+                    // ==========================
+// SUCCESS BUTTON
+// ==========================
+
+predictBtn.innerHTML =
+    '<i class="fa-solid fa-check"></i> Prediction Complete';
+
+predictBtn.style.background =
+    "#16a34a";
+
+// Enable button again
+predictBtn.disabled = false;
+
+// Reset button after 1 second
+setTimeout(function () {
+
+    predictBtn.innerHTML =
+        '<i class="fa-solid fa-brain"></i> Run Prediction';
+
+    predictBtn.style.background = "";
+
+}, 1000);
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Prediction Error:",
+                        error
+                    );
+
+
+                    if (errorBox) {
+
+                        errorBox.innerHTML =
+                            '<i class="fa-solid fa-circle-exclamation"></i> ' +
+                            error.message;
+
+                        errorBox.style.display =
+                            "block";
+
+                    }
+
+
+                    predictBtn.innerHTML =
+                        '<i class="fa-solid fa-brain"></i> Run Prediction';
+
+
+                    predictBtn.disabled = false;
+
+                }
+
+            }
+        );
+
+    }
+
+
+  // ======================================================
+// REPORT CHART
+// ======================================================
+
+const reportChart =
+    document.getElementById("deliveryChart");
+
+const totalDeliveries =
+    document.getElementById("totalDeliveries");
+
+const totalDistance =
+    document.getElementById("totalDistance");
+
+const totalDeliveryTime =
+    document.getElementById("totalDeliveryTime");
+
+const averageDeliveryTime =
+    document.getElementById("averageDeliveryTime");
+
+
+if (reportChart) {
+
+    fetch("/api/report")
+
+        .then(function(response) {
+
+            return response.json();
+
+        })
+
+        .then(function(data) {
+
+            if (!data.success) {
+
+                console.error(
+                    "Report Error:",
+                    data.message
+                );
+
+                return;
+
+            }
+
+
+            // ==========================================
+            // UPDATE REPORT CARDS
+            // ==========================================
+
+            if (totalDeliveries) {
+
+                totalDeliveries.innerHTML =
+                    data.total_deliveries;
+
+            }
+
+
+            if (totalDistance) {
+
+                totalDistance.innerHTML =
+                    Number(
+                        data.total_distance_km
+                    ).toFixed(2) + " km";
+
+            }
+
+
+            if (totalDeliveryTime) {
+
+                const totalHours =
+                    Number(
+                        data.total_delivery_time_min
+                    ) / 60;
+
+                totalDeliveryTime.innerHTML =
+                    totalHours.toFixed(2) + " hrs";
+
+            }
+
+
+            if (averageDeliveryTime) {
+
+                averageDeliveryTime.innerHTML =
+                    Number(
+                        data.average_delivery_time_min
+                    ).toFixed(2) + " min";
+
+            }
+
+
+            // ==========================================
+            // TRAFFIC DATA
+            // ==========================================
+
+            const trafficData =
+                data.traffic_analysis || {};
+
+            const trafficLabels =
+                Object.keys(trafficData);
+
+            const trafficValues =
+                Object.values(trafficData);
+
+
+            // ==========================================
+            // CREATE CHART
+            // ==========================================
+
+            new Chart(
+                reportChart,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: trafficLabels,
+
+                        datasets: [{
+
+                            label:
+                                "Average Delivery Time (min)",
+
+                            data:
+                                trafficValues
+
+                        }]
+
+                    },
+
+                    options: {
+
+    responsive: true,
+
+    maintainAspectRatio: true,
+
+    aspectRatio: 2,
+
+                        plugins: {
+
+                            legend: {
+
+                                display: true
+
+                            }
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                title: {
+
+                                    display: true,
+
+                                    text:
+                                        "Delivery Time (minutes)"
+
+                                }
+
+                            },
+
+                            x: {
+
+                                title: {
+
+                                    display: true,
+
+                                    text:
+                                        "Traffic Condition"
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        })
+
+                     .catch(function(error) {
+
+            console.error(
+                "Report Loading Error:",
+                error
+            );
+
+        });
+
+    }
+
+
+// ======================================================
+// DASHBOARD DATA
+// ======================================================
+
+const dashboardDeliveries =
+    document.getElementById("dashboardDeliveries");
+
+const dashboardDistance =
+    document.getElementById("dashboardDistance");
+
+const dashboardTime =
+    document.getElementById("dashboardTime");
+
+const dashboardFuel =
+    document.getElementById("dashboardFuel");
+
+
+if (dashboardDeliveries) {
+
+    // Get dataset information
+    fetch("/api/report")
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+
+            if (!data.success) {
+                console.error(
+                    "Dashboard Report Error:",
+                    data.message
+                );
+                return;
+            }
+
+            // Total deliveries
+            dashboardDeliveries.innerHTML =
+                data.total_deliveries;
+
+            // Total delivery time
+            dashboardTime.innerHTML =
+                Number(
+                    data.total_delivery_time_min
+                ).toFixed(2) + " min";
+
+        })
+        .catch(function(error) {
+
+            console.error(
+                "Dashboard Data Error:",
+                error
+            );
+
+        });
+
+
+    // Get optimized route information
+    fetch("/api/optimize", {
+        method: "POST"
+    })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+
+            if (!data.success) {
+                console.error(
+                    "Dashboard Optimization Error:",
+                    data.message
+                );
+                return;
+            }
+
+            // Optimized distance
+            const optimizedDistance =
+                Number(data.total_distance_km || 0);
+
+            dashboardDistance.innerHTML =
+                optimizedDistance.toFixed(2) + " km";
+
+
+            // Estimated fuel usage
+            // Assumption: 10 km per litre
+            const fuelUsage =
+                optimizedDistance / 10;
+
+            dashboardFuel.innerHTML =
+                fuelUsage.toFixed(2) + " L";
+
+        })
+            .catch(function(error) {
+
+        console.error(
+            "Dashboard Optimization Error:",
+            error
+        );
+
+    });
+
+}
+
+
+// ======================================================
+// DASHBOARD OPTIMIZE BUTTON
+// ======================================================
+
+const dashboardOptimizeBtn =
+    document.getElementById("dashboardOptimizeBtn");
+
+if (dashboardOptimizeBtn) {
+
+    dashboardOptimizeBtn.addEventListener(
+        "click",
+        function () {
+
+            window.location.href = "/optimize";
+
+        }
+    );
+
+}
+
+
+});
+// ==========================================================
+// DISPLAY OPTIMIZED ROUTE TABLE
+// ==========================================================
+
+function displayRouteTable(route) {
+
+
+    const routeContainer =
+        document.querySelector(
+            ".table-container"
+        );
+
+
+    const emptyRoute =
+        document.querySelector(
+            ".empty-route"
+        );
+
+
+    if (!routeContainer) {
+
+        return;
+
+    }
+
+
+    // ==============================================
+    // CHECK ROUTE DATA
+    // ==============================================
+
+    if (
+        !Array.isArray(route) ||
+        route.length === 0
+    ) {
+
+        routeContainer.innerHTML = `
+
+            <div class="empty-route">
+
+                <i class="fa-solid fa-route"></i>
+
+                <h3>
+                    No Route Data Available
+                </h3>
+
+                <p>
+                    The optimization API did not
+                    return any delivery records.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    // ==============================================
+    // CREATE TABLE
+    // ==============================================
+
+    let tableHTML = `
+
+        <table class="route-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Route Order</th>
+
+                    <th>Customer</th>
+
+                    <th>Latitude</th>
+
+                    <th>Longitude</th>
+
+                    <th>Distance</th>
+
+                    <th>Traffic</th>
+
+                    <th>Weather</th>
+
+                    <th>Delivery Time</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    // ==============================================
+    // ADD ROUTE ROWS
+    // ==============================================
+
+    route.forEach(
+        function (delivery, index) {
+
+
+            const order =
+                delivery.route_order ??
+                (index + 1);
+
+
+            const customer =
+                delivery.customer ??
+                "Unknown";
+
+
+            const latitude =
+                delivery.latitude ??
+                "-";
+
+
+            const longitude =
+                delivery.longitude ??
+                "-";
+
+
+            const distance =
+                Number(
+                    delivery.route_distance_km || 0
+                );
+
+
+            const traffic =
+                delivery.traffic ??
+                "-";
+
+
+            const weather =
+                delivery.weather ??
+                "-";
+
+
+            const deliveryTime =
+                delivery.delivery_time_min ??
+                "-";
+
+
+            tableHTML += `
+
+                <tr>
+
+                    <td>
+                        ${order}
+                    </td>
+
+                    <td>
+                        ${customer}
+                    </td>
+
+                    <td>
+                        ${Number(latitude).toFixed(4)}
+                    </td>
+
+                    <td>
+                        ${Number(longitude).toFixed(4)}
+                    </td>
+
+                    <td>
+                        ${distance.toFixed(2)} km
+                    </td>
+
+                    <td>
+                        ${traffic}
+                    </td>
+
+                    <td>
+                        ${weather}
+                    </td>
+
+                    <td>
+                        ${deliveryTime} min
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    tableHTML += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    routeContainer.innerHTML =
+        tableHTML;
+
+
+    // Hide initial empty state
+
+    if (emptyRoute) {
+
+        emptyRoute.style.display =
+            "none";
+
+    }
+
+}
+
+
+// ==========================================================
+// SHOW OPTIMIZATION ERROR
+// ==========================================================
+
+function showOptimizationError(message) {
+
+
+    let errorBox =
+        document.querySelector(
+            ".error-message"
+        );
+
+
+    if (!errorBox) {
+
+
+        errorBox =
+            document.createElement(
+                "div"
+            );
+
+
+        errorBox.className =
+            "error-message";
+
+
+        const main =
+            document.querySelector(
+                ".main"
+            );
+
+
+        if (main) {
+
+            const content =
+                main.querySelector(
+                    ".content"
+                );
+
+
+            main.insertBefore(
+                errorBox,
+                content
+            );
+
         }
 
     }
 
-    requestAnimationFrame(animation);
+
+    errorBox.innerHTML = `
+
+        <i class="fa-solid fa-circle-exclamation"></i>
+
+        ${message}
+
+    `;
+
+
+    errorBox.style.display =
+        "block";
 
 }
-
-// Start animation when page loads
-
-window.onload = () => {
-
-    const cards = document.querySelectorAll(".card h2");
-
-    if(cards.length >= 4){
-
-        animateValue(cards[0],0,124,1500);
-
-        animateValue(cards[1],0,268,1700," km");
-
-        animateValue(cards[2],0,315,1800," min");
-
-        animateValue(cards[3],0,52,1600," L");
-
-    }
-
-};
-
-// Button animation
-
-const button = document.querySelector(".btn");
-
-if(button){
-
-button.addEventListener("click",()=>{
-
-button.innerHTML="Optimizing...";
-
-button.disabled=true;
-
-setTimeout(()=>{
-
-button.innerHTML="Route Optimized ✔";
-
-button.style.background="#16a34a";
-
-},2500);
-
-});
-
-}
-
-// Card hover effect
-
-const cards=document.querySelectorAll(".card");
-
-cards.forEach(card=>{
-
-card.addEventListener("mouseenter",()=>{
-
-card.style.transform="translateY(-10px) scale(1.03)";
-
-});
-
-card.addEventListener("mouseleave",()=>{
-
-card.style.transform="translateY(0px) scale(1)";
-
-});
-
-});
-
-// Sidebar Active Menu
-
-const menuItems=document.querySelectorAll(".sidebar ul li");
-
-menuItems.forEach(item=>{
-
-item.addEventListener("click",()=>{
-
-menuItems.forEach(i=>i.classList.remove("active"));
-
-item.classList.add("active");
-
-});
-
-});
-
-// Greeting
-
-const hour=new Date().getHours();
-
-let greeting="Welcome";
-
-if(hour<12){
-
-greeting="Good Morning 👋";
-
-}
-else if(hour<17){
-
-greeting="Good Afternoon ☀";
-
-}
-else{
-
-greeting="Good Evening 🌙";
-
-}
-
-const title=document.querySelector(".header h1");
-
-if(title){
-
-title.innerHTML=greeting+"<br>AI/ML Delivery Route Optimization System";
-
-}
-// ===============================
-// Upload Dataset
-// ===============================
-
-const csvFile=document.getElementById("csvFile");
-
-if(csvFile){
-
-csvFile.addEventListener("change",function(){
-
-const file=this.files[0];
-
-if(file){
-
-document.getElementById("fileName").innerHTML=
-"Selected File : "+file.name+" ✅";
-
-}
-
-});
-
-}
-// Route Optimization Button
-
-const optimizeBtn = document.getElementById("optimizeBtn");
-
-if(optimizeBtn){
-
-optimizeBtn.addEventListener("click",function(){
-
-document.getElementById("stops").innerHTML="12";
-
-document.getElementById("distance").innerHTML="23.5 km";
-
-document.getElementById("time").innerHTML="48 min";
-
-this.innerHTML="Route Optimized ✔";
-
-this.style.background="#16a34a";
-
-});
-
-}
-/* ===========================
-   AI Prediction
-=========================== */
-
-const predictBtn=document.getElementById("predictBtn");
-
-if(predictBtn){
-
-predictBtn.addEventListener("click",()=>{
-
-document.getElementById("predictionTime").innerHTML="42 min";
-
-document.getElementById("traffic").innerHTML="Medium";
-
-document.getElementById("weather").innerHTML="Cloudy";
-
-document.getElementById("accuracy").innerHTML="96%";
-
-predictBtn.innerHTML="Prediction Complete ✔";
-
-predictBtn.style.background="#16a34a";
-
-});
-}
-/* ===========================
-   Report Chart
-=========================== */
-
-const chart=document.getElementById("deliveryChart");
-
-if(chart){
-
-new Chart(chart,{
-
-type:"bar",
-
-data:{
-
-labels:["Mon","Tue","Wed","Thu","Fri","Sat"],
-
-datasets:[{
-
-label:"Deliveries",
-
-data:[18,22,15,28,26,32],
-
-backgroundColor:"#2563eb"
-
-}]
-
-},
-
-options:{
-
-responsive:true,
-
-plugins:{
-
-legend:{
-
-display:false
-
-}
-
-}
-
-}
-
-});
-
-}
-// ===============================
-// Upload Dataset
-// ===============================
-
-const csvFile=document.getElementById("csvFile");
-
-if(csvFile){
-
-csvFile.addEventListener("change",function(){
-
-const file=this.files[0];
-
-if(file){
-
-document.getElementById("fileName").innerHTML=
-"Selected File : "+file.name+" ✅";
-
-}
-
-});

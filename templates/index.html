@@ -22,14 +22,14 @@
 
 <body>
 
-    <!-- Sidebar -->
+    <!-- Sidebar --> 
 
     <div class="sidebar">
 
         <div class="logo">
 
             <i class="fa-solid fa-truck-fast"></i>
-
+  
             <h2>AI Route</h2>
 
         </div>
@@ -105,47 +105,47 @@
 
         <div class="cards">
 
-            <div class="card">
+    <div class="card">
 
-                <i class="fa-solid fa-location-dot"></i>
+        <i class="fa-solid fa-location-dot"></i>
 
-                <h2>0</h2>
+        <h2 id="dashboardDeliveries">0</h2>
 
-                <p>Total Deliveries</p>
+        <p>Total Deliveries</p>
 
-            </div>
+    </div>
 
-            <div class="card">
+    <div class="card">
 
-                <i class="fa-solid fa-road"></i>
+        <i class="fa-solid fa-road"></i>
 
-                <h2>0 km</h2>
+        <h2 id="dashboardDistance">0 km</h2>
 
-                <p>Optimized Distance</p>
+        <p>Optimized Distance</p>
 
-            </div>
+    </div>
 
-            <div class="card">
+    <div class="card">
 
-                <i class="fa-solid fa-clock"></i>
+        <i class="fa-solid fa-clock"></i>
 
-                <h2>0 min</h2>
+        <h2 id="dashboardTime">0 min</h2>
 
-                <p>Estimated Time</p>
+        <p>Estimated Time</p>
 
-            </div>
+    </div>
 
-            <div class="card">
+    <div class="card">
 
-                <i class="fa-solid fa-gas-pump"></i>
+        <i class="fa-solid fa-gas-pump"></i>
 
-                <h2>0 L</h2>
+        <h2 id="dashboardFuel">0 L</h2>
 
-                <p>Fuel Saved</p>
+        <p>Estimated Fuel Usage</p>
 
-            </div>
+    </div>
 
-        </div>
+</div>
 
         <!-- Overview -->
 
@@ -163,11 +163,13 @@
 
                 </p>
 
-                <button class="btn">
+                <button class="btn" id="dashboardOptimizeBtn">
 
-                    Optimize Route
+    <i class="fa-solid fa-route"></i>
 
-                </button>
+    Optimize Route
+
+</button>
 
             </div>
 
@@ -186,4 +188,4 @@
 
 </body>
 
-</html>
+</html>  
