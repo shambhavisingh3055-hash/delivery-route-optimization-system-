@@ -73,9 +73,9 @@ def optimize_route(df):
     # Make a copy so original dataset isn't changed
     deliveries = df.copy()
 
-    # Warehouse / starting point
-    warehouse_lat = 20.0000
-    warehouse_lon = 77.0000
+    # Warehouse / starting point - SRMCEM, Lucknow
+    warehouse_lat = 26.8467
+    warehouse_lon = 80.9496
 
     current_location = (
         warehouse_lat,

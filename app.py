@@ -5,10 +5,256 @@ import pickle
 
 from route_optimizer import optimize_route
 
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
+LOCATION_FILE = os.path.join(
+    "location_data",
+    "locations.csv"
+)
 
+# ==========================================
+# MONGODB CONNECTION
+# ==========================================
+
+MONGO_URI = "mongodb://localhost:27017/"
+
+client = MongoClient(MONGO_URI)
+
+db = client["ai_route"]
+
+deliveries_collection = db["deliveries"]
+
+# ==========================================
+# MONGODB CONNECTION TEST
+# ==========================================
+
+@app.route("/api/db-test")
+def db_test():
+
+    try:
+
+        client.admin.command("ping")
+
+        return jsonify({
+
+            "success": True,
+
+            "message":
+                "MongoDB connected successfully.",
+
+            "database":
+                db.name,
+
+            "collection":
+                deliveries_collection.name
+
+        })
+
+    except Exception as e:
+
+        print(
+            "MONGODB ERROR:",
+            e
+        )
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+                "MongoDB connection failed.",
+
+            "error":
+                str(e)
+
+        }), 500
+
+ # ==========================================
+# LOCATION COORDINATE LOOKUP
+# ==========================================
+
+def get_coordinates(address, city, pincode):
+
+    if not os.path.exists(LOCATION_FILE):
+        return None, None
+
+    locations = pd.read_csv(LOCATION_FILE)
+
+    match = locations[
+        (locations["location"].str.lower() == address.lower()) &
+        (locations["city"].str.lower() == city.lower()) &
+        (locations["pincode"].astype(str) == str(pincode))
+    ]
+
+    if match.empty:
+        return None, None
+
+    latitude = float(match.iloc[0]["latitude"])
+    longitude = float(match.iloc[0]["longitude"])
+
+    return latitude, longitude
+    
+ # ==========================================
+# ADD NEW DELIVERY
+# ==========================================
+@app.route("/api/deliveries", methods=["POST"])
+def add_delivery():
+    try:
+        data = request.get_json()
+
+        customer_name = data.get("customer_name", "").strip()
+        phone = data.get("phone", "").strip()
+        address = data.get("address", "").strip()
+        city = data.get("city", "").strip()
+        pincode = data.get("pincode", "").strip()
+        instructions = data.get("instructions", "").strip()
+
+        if not customer_name or not phone or not address or not city or not pincode:
+            return jsonify({
+                "success": False,
+                "message": "Please provide all required customer details."
+            }), 400
+
+        # Get latitude and longitude
+        latitude, longitude = get_coordinates(
+            address,
+            city,
+            pincode
+        )
+
+        if latitude is None:
+            return jsonify({
+                "success": False,
+                "message": "This location is not available in our location data."
+            }), 400
+
+        last_delivery = deliveries_collection.find_one(
+            {},
+            sort=[("delivery_id", -1)]
+        )
+
+        if last_delivery and str(last_delivery.get("delivery_id", "")).startswith("D"):
+            try:
+                last_number = int(
+                    str(last_delivery["delivery_id"])[1:]
+                )
+                next_number = last_number + 1
+
+            except ValueError:
+                next_number = deliveries_collection.count_documents({}) + 1
+
+        else:
+            next_number = deliveries_collection.count_documents({}) + 1
+
+        delivery_id = f"D{next_number:03d}"
+        delivery = {
+            "delivery_id": delivery_id,
+            "customer": customer_name,
+            "phone": phone,
+            "address": address,
+            "city": city,
+            "pincode": pincode,
+            "instructions": instructions,
+            "latitude": latitude,
+            "longitude": longitude,
+            "status": "new"
+        }
+        deliveries_collection.insert_one(delivery)
+
+        delivery.pop("_id", None)
+
+        return jsonify({
+            "success": True,
+            "message": "New delivery added successfully.",
+            "delivery_id": delivery_id,
+            "data": delivery
+        }), 201
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500  
+
+ # ==========================================
+# IMPORT CSV DATA INTO MONGODB
+# ==========================================
+@app.route("/api/import-csv", methods=["POST"])
+def import_csv_to_mongodb():
+
+    try:
+
+        file_path = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            "delivery_data.csv"
+        )
+
+        # Check CSV
+        if not os.path.exists(file_path):
+
+            return jsonify({
+                "success": False,
+                "message": "delivery_data.csv not found."
+            }), 400
+
+        # Read CSV
+        df = pd.read_csv(file_path)
+
+        # Convert DataFrame to dictionaries
+        records = df.to_dict(orient="records")
+
+        # Clear existing MongoDB delivery records
+        deliveries_collection.delete_many({})
+
+        # Insert records
+        if records:
+
+            result = deliveries_collection.insert_many(records)
+
+            inserted_count = len(result.inserted_ids)
+
+        else:
+
+            inserted_count = 0
+
+        return jsonify({
+
+            "success": True,
+
+            "message":
+                "CSV data imported into MongoDB successfully.",
+
+            "records_inserted":
+                inserted_count,
+
+            "database":
+                db.name,
+
+            "collection":
+                deliveries_collection.name
+
+        })
+
+    except Exception as e:
+
+        print(
+            "MONGODB IMPORT ERROR:",
+            e
+        )
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+                "An error occurred while importing CSV data.",
+
+            "error":
+                str(e)
+
+        }), 500
+    
 # ==========================================
 # CONFIGURATION
 # ==========================================
@@ -53,6 +299,16 @@ def upload():
         "upload.html"
     )
 
+# ==========================================
+# NEW DELIVERY PAGE
+# ==========================================
+
+@app.route("/new-delivery")
+def new_delivery():
+
+    return render_template(
+        "new_delivery.html"
+    )
 
 # ==========================================
 # UPLOAD DATASET API
@@ -256,45 +512,79 @@ def api_optimize():
     try:
 
         # ======================================
-        # DATASET PATH
+        # GET NEW DELIVERIES FROM MONGODB
         # ======================================
 
-        file_path = os.path.join(
-
-            app.config["UPLOAD_FOLDER"],
-
-            "delivery_data.csv"
-
+        records = list(
+            deliveries_collection.find(
+                {"status": "new"},
+                {"_id": 0}
+            )
         )
 
 
         # ======================================
-        # CHECK DATASET
+        # CHECK NEW DELIVERIES
         # ======================================
 
-        if not os.path.exists(file_path):
+        if not records:
 
             return jsonify({
-
                 "success": False,
-
-                "message":
-                    "Please upload a delivery dataset first."
-
+                "message": "No new deliveries available for optimization."
             }), 400
 
 
         # ======================================
-        # READ DATASET
+        # CREATE DATAFRAME
         # ======================================
 
-        df = pd.read_csv(
-            file_path
-        )
+        df = pd.DataFrame(records)
 
 
         # ======================================
-        # RUN ROUTE OPTIMIZATION
+        # CHECK REQUIRED COLUMNS
+        # ======================================
+
+        required_columns = [
+            "delivery_id",
+            "customer",
+            "latitude",
+            "longitude"
+        ]
+
+        missing_columns = [
+            column
+            for column in required_columns
+            if column not in df.columns
+        ]
+
+        if missing_columns:
+
+            return jsonify({
+                "success": False,
+                "message": "Delivery data is missing required location fields.",
+                "missing_columns": missing_columns
+            }), 400
+
+
+        # ======================================
+        # CHECK COORDINATES
+        # ======================================
+
+        if (
+            df["latitude"].isnull().any()
+            or df["longitude"].isnull().any()
+        ):
+
+            return jsonify({
+                "success": False,
+                "message": "One or more deliveries do not have valid coordinates."
+            }), 400
+
+
+        # ======================================
+        # RUN EXISTING ROUTE OPTIMIZER
         # ======================================
 
         optimized_route, total_distance = optimize_route(
@@ -303,13 +593,54 @@ def api_optimize():
 
 
         # ======================================
-        # CONVERT RESULT TO JSON
+        # GET DELIVERY IDs
+        # ======================================
+
+        route_ids = optimized_route[
+            "delivery_id"
+        ].tolist()
+
+
+        # ======================================
+        # UPDATE DELIVERY STATUS
+        # NEW → OPTIMIZED
+        # ======================================
+
+        deliveries_collection.update_many(
+            {
+                "delivery_id": {
+                    "$in": route_ids
+                },
+                "status": "new"
+            },
+            {
+                "$set": {
+                    "status": "optimized"
+                }
+            }
+        )
+
+
+        # ======================================
+        # UPDATE STATUS IN RESPONSE
+        # ======================================
+
+        optimized_route["status"] = "optimized"
+
+
+         # ======================================
+        # CONVERT ROUTE TO JSON
         # ======================================
 
         route_data = optimized_route.to_dict(
             orient="records"
         )
 
+        # Replace NaN values with None for valid JSON
+        for record in route_data:
+            for key, value in record.items():
+                if pd.isna(value):
+                    record[key] = None
 
         # ======================================
         # RETURN RESULT
@@ -341,17 +672,19 @@ def api_optimize():
             e
         )
 
-
         return jsonify({
 
             "success": False,
 
             "message":
-                "An error occurred during route optimization."
+                "An error occurred during route optimization.",
+
+            "error":
+                str(e)
 
         }), 500
 
-
+       
 # ==========================================
 # AI PREDICTION PAGE
 # ==========================================
@@ -570,7 +903,7 @@ def api_predict():
                 "An error occurred while making the prediction."
 
         }), 500
-    # ==========================================
+  # ==========================================
 # REPORTS API
 # ==========================================
 
@@ -579,71 +912,177 @@ def api_report():
 
     try:
 
-        file_path = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            "delivery_data.csv"
+        # ======================================
+        # GET DELIVERIES FROM MONGODB
+        # ======================================
+
+        records = list(
+            deliveries_collection.find(
+                {},
+                {"_id": 0}
+            )
         )
 
-        if not os.path.exists(file_path):
+        # ======================================
+        # CHECK DELIVERY DATA
+        # ======================================
 
+        if not records:
             return jsonify({
                 "success": False,
-                "message": "Dataset not found."
+                "message": "No delivery data available."
             }), 400
 
-        df = pd.read_csv(file_path)
+        # ======================================
+        # CREATE DATAFRAME
+        # ======================================
+
+        df = pd.DataFrame(records)
+
+        # ======================================
+        # TOTAL DELIVERIES
+        # ======================================
 
         total_deliveries = len(df)
 
-        total_distance = df["distance_km"].sum()
+        # ======================================
+        # TOTAL DISTANCE
+        # ======================================
 
-        total_delivery_time = df["delivery_time_min"].sum()
+        if "distance_km" in df.columns:
 
-        average_delivery_time = df["delivery_time_min"].mean()
+            total_distance = pd.to_numeric(
+                df["distance_km"],
+                errors="coerce"
+            ).sum()
 
-        traffic_analysis = (
-            df.groupby("traffic")["delivery_time_min"]
-            .mean()
-            .round(2)
-            .to_dict()
+        else:
+
+            total_distance = 0
+
+        # ======================================
+        # DELIVERY TIME
+        # ======================================
+
+        if "delivery_time_min" in df.columns:
+
+            delivery_times = pd.to_numeric(
+                df["delivery_time_min"],
+                errors="coerce"
+            )
+
+            total_delivery_time = delivery_times.sum()
+
+            average_delivery_time = delivery_times.mean()
+
+        else:
+
+            total_delivery_time = 0
+
+            average_delivery_time = 0
+                    # ======================================
+        # OPTIMIZED ROUTE DISTANCE
+        # ======================================
+
+        optimized_records = list(
+            deliveries_collection.find(
+                {"status": "optimized"},
+                {"_id": 0}
+            )
         )
+
+        optimized_distance = 0
+
+        if optimized_records:
+
+            optimized_df = pd.DataFrame(
+                optimized_records
+            )
+
+            optimized_route, optimized_distance = optimize_route(
+                optimized_df
+            )
+
+        optimized_distance = round(
+            float(optimized_distance),
+            2
+        )
+
+        # ======================================
+        # TRAFFIC ANALYSIS
+        # ======================================
+
+        if (
+            "traffic" in df.columns
+            and "delivery_time_min" in df.columns
+        ):
+
+            traffic_analysis = (
+                df.groupby("traffic")["delivery_time_min"]
+                .mean()
+                .round(2)
+                .to_dict()
+            )
+
+        else:
+
+            traffic_analysis = {}
+
+        # ======================================
+        # RETURN REPORT DATA
+        # ======================================
 
         return jsonify({
 
             "success": True,
 
-            "total_deliveries": total_deliveries,
+            "total_deliveries":
+                total_deliveries,
 
-            "total_distance_km": round(
-                total_distance, 2
-            ),
+            "total_distance_km":
+                round(
+                    float(total_distance),
+                    2
+                ),
 
-            "total_delivery_time_min": round(
-                total_delivery_time, 2
-            ),
+            "total_delivery_time_min":
+                round(
+                    float(total_delivery_time),
+                    2
+                ),
 
-            "average_delivery_time_min": round(
-                average_delivery_time, 2
-            ),
+            "average_delivery_time_min":
+                round(
+                    float(average_delivery_time),
+                    2
+                ),
 
-            "traffic_analysis": traffic_analysis,
+            "traffic_analysis":
+                traffic_analysis,
 
-            "model_r2": 0.84
+                       "model_r2":
+                0.84,
+
+            "optimized_distance_km":
+                optimized_distance
 
         })
 
     except Exception as e:
 
-        print("REPORT ERROR:", e)
+        print(
+            "REPORT ERROR:",
+            e
+        )
 
         return jsonify({
 
             "success": False,
 
-            "message": "An error occurred while generating the report."
+            "message":
+                "An error occurred while generating the report."
 
         }), 500
-
 
 # ==========================================
 # REPORT PAGE

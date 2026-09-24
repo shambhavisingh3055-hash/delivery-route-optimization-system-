@@ -108,180 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ======================================================
-    // ROUTE OPTIMIZATION
-    // ======================================================
-
-    const optimizeBtn =
-        document.getElementById("optimizeBtn");
-
-
-    if (optimizeBtn) {
-
-        optimizeBtn.addEventListener(
-            "click",
-            async function () {
-
-                optimizeBtn.disabled = true;
-
-                optimizeBtn.innerHTML =
-                    '<i class="fa-solid fa-spinner fa-spin"></i> Optimizing...';
-
-
-                try {
-
-                    const response =
-                        await fetch(
-                            "/api/optimize",
-                            {
-                                method: "POST"
-                            }
-                        );
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (
-                        !response.ok ||
-                        !data.success
-                    ) {
-
-                        throw new Error(
-                            data.message ||
-                            "Route optimization failed."
-                        );
-
-                    }
-
-
-                    // ==============================
-                    // UPDATE STOPS
-                    // ==============================
-
-                    const stops =
-                        document.getElementById("stops");
-
-
-                    if (stops) {
-
-                        stops.innerHTML =
-                            data.total_deliveries ?? 0;
-
-                    }
-
-
-                    // ==============================
-                    // UPDATE DISTANCE
-                    // ==============================
-
-                    const distance =
-                        document.getElementById("distance");
-
-
-                    if (distance) {
-
-                        const totalDistance =
-                            Number(
-                                data.total_distance_km || 0
-                            );
-
-
-                        distance.innerHTML =
-                            totalDistance.toFixed(2) +
-                            " km";
-
-                    }
-
-
-                    // ==============================
-                    // CALCULATE DELIVERY TIME
-                    // ==============================
-
-                    let totalTime = 0;
-
-
-                    if (
-                        Array.isArray(data.route)
-                    ) {
-
-                        data.route.forEach(
-                            function (delivery) {
-
-                                totalTime +=
-                                    Number(
-                                        delivery.delivery_time_min || 0
-                                    );
-
-                            }
-                        );
-
-                    }
-
-
-                    const time =
-                        document.getElementById("time");
-
-
-                    if (time) {
-
-                        time.innerHTML =
-                            Math.round(totalTime) +
-                            " min";
-
-                    }
-
-
-                    // ==============================
-                    // DISPLAY ROUTE TABLE
-                    // ==============================
-
-                    displayRouteTable(
-                        data.route
-                    );
-
-
-                    // ==============================
-                    // SUCCESS BUTTON
-                    // ==============================
-
-                    optimizeBtn.innerHTML =
-                        '<i class="fa-solid fa-check"></i> Route Optimized';
-
-
-                    optimizeBtn.style.background =
-                        "#16a34a";
-
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "Optimization Error:",
-                        error
-                    );
-
-
-                    showOptimizationError(
-                        error.message
-                    );
-
-
-                    optimizeBtn.innerHTML =
-                        '<i class="fa-solid fa-wand-magic-sparkles"></i> Optimize Route';
-
-
-                    optimizeBtn.disabled = false;
-
-                }
-
-            }
-        );
-
-    }
-
-
+   
     // ======================================================
     // AI PREDICTION
     // ======================================================
@@ -791,7 +618,7 @@ const dashboardFuel =
 
 if (dashboardDeliveries) {
 
-    // Get dataset information
+    // Get dashboard data
     fetch("/api/report")
         .then(function(response) {
             return response.json();
@@ -799,22 +626,57 @@ if (dashboardDeliveries) {
         .then(function(data) {
 
             if (!data.success) {
+
                 console.error(
                     "Dashboard Report Error:",
                     data.message
                 );
+
                 return;
             }
 
-            // Total deliveries
+
+            // ======================================
+            // TOTAL DELIVERIES
+            // ======================================
+
             dashboardDeliveries.innerHTML =
                 data.total_deliveries;
 
-            // Total delivery time
+
+            // ======================================
+            // ESTIMATED TIME
+            // ======================================
+
             dashboardTime.innerHTML =
                 Number(
-                    data.total_delivery_time_min
+                    data.total_delivery_time_min || 0
                 ).toFixed(2) + " min";
+
+
+            // ======================================
+            // OPTIMIZED DISTANCE
+            // ======================================
+
+            const optimizedDistance =
+                Number(
+                    data.optimized_distance_km || 0
+                );
+
+            dashboardDistance.innerHTML =
+                optimizedDistance.toFixed(2) + " km";
+
+
+            // ======================================
+            // ESTIMATED FUEL USAGE
+            // Assumption: 10 km per litre
+            // ======================================
+
+            const fuelUsage =
+                optimizedDistance / 10;
+
+            dashboardFuel.innerHTML =
+                fuelUsage.toFixed(2) + " L";
 
         })
         .catch(function(error) {
@@ -826,52 +688,11 @@ if (dashboardDeliveries) {
 
         });
 
-
-    // Get optimized route information
-    fetch("/api/optimize", {
-        method: "POST"
-    })
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-
-            if (!data.success) {
-                console.error(
-                    "Dashboard Optimization Error:",
-                    data.message
-                );
-                return;
-            }
-
-            // Optimized distance
-            const optimizedDistance =
-                Number(data.total_distance_km || 0);
-
-            dashboardDistance.innerHTML =
-                optimizedDistance.toFixed(2) + " km";
-
-
-            // Estimated fuel usage
-            // Assumption: 10 km per litre
-            const fuelUsage =
-                optimizedDistance / 10;
-
-            dashboardFuel.innerHTML =
-                fuelUsage.toFixed(2) + " L";
-
-        })
-            .catch(function(error) {
-
-        console.error(
-            "Dashboard Optimization Error:",
-            error
-        );
-
-    });
-
 }
 
+
+   
+           
 
 // ======================================================
 // DASHBOARD OPTIMIZE BUTTON

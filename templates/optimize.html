@@ -173,21 +173,7 @@
 
 
 
-            <!-- Estimated Time -->
-
-            <div class="card">
-
-                <i class="fa-solid fa-clock"></i>
-
-                <h2 id="time">
-                    0 min
-                </h2>
-
-                <p>
-                    Estimated Time
-                </p>
-
-            </div>
+          
 
         </div>
 
@@ -196,9 +182,25 @@
         <!-- ================= ERROR MESSAGE ================= -->
 
         <div class="error-message"
+             id="errorMessage"
              style="display:none;">
 
             <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span id="errorText"></span>
+
+        </div>
+
+
+
+        <!-- ================= SUCCESS MESSAGE ================= -->
+
+        <div id="successMessage"
+             style="display:none;">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            <span>Route optimized successfully.</span>
 
         </div>
 
@@ -218,15 +220,13 @@
                 </h2>
 
 
+                <!-- ================= ROUTE TABLE ================= -->
 
-                <!-- IMPORTANT:
-                     JavaScript will insert the
-                     optimized route table here.
-                -->
+                <div class="table-container"
+                     id="routeContainer">
 
-                <div class="table-container">
-
-                    <div class="empty-route">
+                    <div class="empty-route"
+                         id="emptyRoute">
 
                         <i class="fa-solid fa-route"></i>
 
@@ -235,12 +235,60 @@
                         </h3>
 
                         <p>
-                            Upload a delivery dataset and
-                            click the button below to generate
-                            an optimized route.
+                            Add new deliveries and click the button
+                            below to generate an optimized route.
                         </p>
 
                     </div>
+
+
+                    <!-- Table will be created here -->
+
+                    <table id="routeTable"
+                           style="display:none;">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Order
+                                </th>
+
+                                <th>
+                                    Delivery ID
+                                </th>
+
+                                <th>
+                                    Customer
+                                </th>
+
+                                <th>
+                                    Address
+                                </th>
+
+                                <th>
+                                    City
+                                </th>
+
+                                <th>
+                                    Distance
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="routeTableBody">
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
@@ -249,11 +297,11 @@
                 <br>
 
 
-
                 <!-- ================= OPTIMIZE BUTTON ================= -->
 
                 <button class="btn"
-                        id="optimizeBtn">
+                        id="optimizeBtn"
+                        type="button">
 
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
 
@@ -287,6 +335,257 @@
     <!-- ================= JAVASCRIPT ================= -->
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+    <!-- ================= ROUTE OPTIMIZATION JAVASCRIPT ================= -->
+
+    <script>
+
+        const optimizeButton =
+            document.getElementById("optimizeBtn");
+
+
+        optimizeButton.addEventListener(
+            "click",
+            optimizeRoute
+        );
+
+
+        async function optimizeRoute() {
+
+            try {
+
+                // ======================================
+                // DISABLE BUTTON
+                // ======================================
+
+                optimizeButton.disabled = true;
+
+                optimizeButton.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Optimizing...';
+
+
+                // ======================================
+                // HIDE OLD MESSAGES
+                // ======================================
+
+                document.getElementById(
+                    "errorMessage"
+                ).style.display = "none";
+
+
+                document.getElementById(
+                    "successMessage"
+                ).style.display = "none";
+
+
+                // ======================================
+                // CALL FLASK API
+                // ======================================
+
+                const response = await fetch(
+                    "/api/optimize",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({})
+                    }
+                );
+
+
+                // ======================================
+                // GET RESPONSE
+                // ======================================
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Optimization Response:",
+                    data
+                );
+
+
+                // ======================================
+                // CHECK FAILURE
+                // ======================================
+
+                if (!data.success) {
+
+                    document.getElementById(
+                        "errorMessage"
+                    ).style.display = "flex";
+
+
+                    document.getElementById(
+                        "errorText"
+                    ).innerText =
+                        data.message ||
+                        "Route optimization failed.";
+
+                    return;
+                }
+
+
+                // ======================================
+                // UPDATE STATISTICS
+                // ======================================
+
+                document.getElementById(
+                    "stops"
+                ).innerText =
+                    data.total_deliveries;
+
+
+                document.getElementById(
+                    "distance"
+                ).innerText =
+                    data.total_distance_km +
+                    " km";
+
+
+                // ======================================
+                // SHOW SUCCESS
+                // ======================================
+
+                document.getElementById(
+                    "successMessage"
+                ).style.display = "flex";
+
+
+                // ======================================
+                // HIDE EMPTY MESSAGE
+                // ======================================
+
+                document.getElementById(
+                    "emptyRoute"
+                ).style.display = "none";
+
+
+                // ======================================
+                // SHOW ROUTE TABLE
+                // ======================================
+
+                document.getElementById(
+                    "routeTable"
+                ).style.display = "table";
+
+
+                // ======================================
+                // CLEAR OLD TABLE
+                // ======================================
+
+                const tableBody =
+                    document.getElementById(
+                        "routeTableBody"
+                    );
+
+                tableBody.innerHTML = "";
+
+
+                // ======================================
+                // ADD OPTIMIZED ROUTE
+                // ======================================
+
+                data.route.forEach(
+                    function(delivery) {
+
+                        const row =
+                            document.createElement(
+                                "tr"
+                            );
+
+
+                        row.innerHTML = `
+
+                            <td>
+                                ${delivery.route_order}
+                            </td>
+
+                            <td>
+                                ${delivery.delivery_id}
+                            </td>
+
+                            <td>
+                                ${delivery.customer}
+                            </td>
+
+                            <td>
+                                ${delivery.address}
+                            </td>
+
+                            <td>
+                                ${delivery.city}
+                            </td>
+
+                            <td>
+                                ${delivery.route_distance_km}
+                                km
+                            </td>
+
+                            <td>
+                                ${delivery.status}
+                            </td>
+
+                        `;
+
+
+                        tableBody.appendChild(
+                            row
+                        );
+
+                    }
+                );
+
+
+               
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Optimization Error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "errorMessage"
+                ).style.display = "flex";
+
+
+                document.getElementById(
+                    "errorText"
+                ).innerText =
+                    "Unable to connect to the optimization server.";
+
+            }
+
+
+            finally {
+
+                // ======================================
+                // ENABLE BUTTON AGAIN
+                // ======================================
+
+                optimizeButton.disabled = false;
+
+
+                optimizeButton.innerHTML =
+                    '<i class="fa-solid fa-wand-magic-sparkles"></i> Optimize Route';
+
+            }
+
+        }
+
+    </script>
 
 
 </body>

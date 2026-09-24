@@ -367,3 +367,228 @@ background:#f5f7ff;
     margin-bottom:25px;
 
 }
+/* ===========================
+   NEW DELIVERY PAGE
+=========================== */
+
+.new-delivery-container{
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+}
+
+
+.new-delivery-box{
+
+    width:750px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:40px 50px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+
+.form-icon{
+
+    width:70px;
+    height:70px;
+
+    margin:0 auto 20px;
+
+    border-radius:50%;
+
+    background:#eff6ff;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+}
+
+
+.form-icon i{
+
+    font-size:32px;
+
+    color:#2563eb;
+
+}
+
+
+.new-delivery-box h2{
+
+    text-align:center;
+
+    color:#0f172a;
+
+    font-size:28px;
+
+    margin-bottom:8px;
+
+}
+
+
+.form-description{
+
+    text-align:center;
+
+    color:#64748b;
+
+    margin-bottom:30px;
+
+}
+
+
+.form-group{
+
+    margin-bottom:20px;
+
+}
+
+
+.form-group label{
+
+    display:block;
+
+    color:#0f172a;
+
+    font-weight:500;
+
+    margin-bottom:8px;
+
+}
+
+
+.form-group label i{
+
+    color:#2563eb;
+
+    width:22px;
+
+}
+
+
+.optional{
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+    font-weight:400;
+
+}
+
+
+.form-group input,
+.form-group textarea{
+
+    width:100%;
+
+    padding:13px 15px;
+
+    border:1px solid #dbe3ef;
+
+    border-radius:10px;
+
+    outline:none;
+
+    font-size:15px;
+
+    color:#0f172a;
+
+    background:#fff;
+
+    transition:.3s;
+
+}
+
+
+.form-group textarea{
+
+    min-height:100px;
+
+    resize:vertical;
+
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.10);
+
+}
+
+
+.form-row{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+
+.add-delivery-btn{
+
+    width:100%;
+
+    margin-top:5px;
+
+}
+
+
+.add-delivery-btn:disabled{
+
+    opacity:.7;
+
+    cursor:not-allowed;
+
+}
+
+
+.delivery-status{
+
+    text-align:center;
+
+    margin-top:18px;
+
+    font-weight:500;
+
+    min-height:24px;
+
+}
+
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    .new-delivery-box{
+
+        width:100%;
+
+        padding:30px 25px;
+
+    }
+
+
+    .form-row{
+
+        grid-template-columns:1fr;
+
+        gap:0;
+
+    }
+
+}

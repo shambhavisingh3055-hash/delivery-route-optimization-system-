@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Delivery</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================
+         SIDEBAR
+    =========================== -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            <h2>AI Route</h2>
+
+        </div>
+
+
+        <ul>
+
+            <li>
+                <a href="/">
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
+                </a>
+            </li>
+
+
+            <li class="active">
+                <a href="/new-delivery">
+                    <i class="fa-solid fa-plus"></i>
+                    New Delivery
+                </a>
+            </li>
+
+
+            <li>
+                <a href="/upload">
+                    <i class="fa-solid fa-upload"></i>
+                    Upload Dataset
+                </a>
+            </li>
+
+
+            <li>
+                <a href="/optimize">
+                    <i class="fa-solid fa-route"></i>
+                    Route Optimization
+                </a>
+            </li>
+
+
+            <li>
+                <a href="/prediction">
+                    <i class="fa-solid fa-brain"></i>
+                    AI Prediction
+                </a>
+            </li>
+
+
+            <li>
+                <a href="/report">
+                    <i class="fa-solid fa-chart-column"></i>
+                    Reports
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+
+    <!-- ==========================
+         MAIN CONTENT
+    =========================== -->
+
+    <div class="main">
+
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div>
+
+                <h1>New Delivery</h1>
+
+                <p>
+                    Add a new customer delivery to the system.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==========================
+             DELIVERY FORM
+        =========================== -->
+
+        <div class="new-delivery-container">
+
+
+            <div class="new-delivery-box">
+
+
+                <div class="form-icon">
+
+                    <i class="fa-solid fa-truck"></i>
+
+                </div>
+
+
+                <h2>Add Delivery Details</h2>
+
+                <p class="form-description">
+                    Enter the customer's delivery information.
+                </p>
+
+
+
+                <form id="deliveryForm">
+
+
+                    <!-- Customer Name -->
+
+                    <div class="form-group">
+
+                        <label for="customerName">
+                            <i class="fa-solid fa-user"></i>
+                            Customer Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customerName"
+                            placeholder="Enter customer name"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- Phone -->
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            <i class="fa-solid fa-phone"></i>
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="Enter phone number"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- Address -->
+
+                    <div class="form-group">
+
+                        <label for="address">
+                            <i class="fa-solid fa-location-dot"></i>
+                            Address
+                        </label>
+
+                        <textarea
+                            id="address"
+                            placeholder="Enter complete delivery address"
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+
+                    <!-- City + Pincode -->
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="city">
+                                <i class="fa-solid fa-city"></i>
+                                City
+                            </label>
+
+                            <input
+                                type="text"
+                                id="city"
+                                placeholder="Enter city"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="pincode">
+                                <i class="fa-solid fa-map-pin"></i>
+                                Pincode
+                            </label>
+
+                            <input
+                                type="text"
+                                id="pincode"
+                                placeholder="Enter pincode"
+                                required
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- Instructions -->
+
+                    <div class="form-group">
+
+                        <label for="instructions">
+                            <i class="fa-solid fa-note-sticky"></i>
+                            Delivery Instructions
+                            <span class="optional">(Optional)</span>
+                        </label>
+
+                        <textarea
+                            id="instructions"
+                            placeholder="Example: Call before delivery"
+                        ></textarea>
+
+                    </div>
+
+
+
+                    <!-- Submit -->
+
+                    <button
+                        type="submit"
+                        class="btn add-delivery-btn"
+                        id="addDeliveryBtn"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add Delivery
+
+                    </button>
+
+
+
+                    <!-- Status -->
+
+                    <p
+                        id="deliveryStatus"
+                        class="delivery-status"
+                    ></p>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==========================
+         JAVASCRIPT
+    =========================== -->
+
+    <script>
+
+        const deliveryForm =
+            document.getElementById("deliveryForm");
+
+        const addDeliveryBtn =
+            document.getElementById("addDeliveryBtn");
+
+        const deliveryStatus =
+            document.getElementById("deliveryStatus");
+
+
+        deliveryForm.addEventListener(
+            "submit",
+            async function(event) {
+
+                event.preventDefault();
+
+
+                const customerName =
+                    document.getElementById("customerName").value.trim();
+
+                const phone =
+                    document.getElementById("phone").value.trim();
+
+                const address =
+                    document.getElementById("address").value.trim();
+
+                const city =
+                    document.getElementById("city").value.trim();
+
+                const pincode =
+                    document.getElementById("pincode").value.trim();
+
+                const instructions =
+                    document.getElementById("instructions").value.trim();
+
+
+
+                if (
+                    !customerName ||
+                    !phone ||
+                    !address ||
+                    !city ||
+                    !pincode
+                ) {
+
+                    deliveryStatus.textContent =
+                        "❌ Please fill all required fields.";
+
+                    deliveryStatus.style.color = "red";
+
+                    return;
+
+                }
+
+
+
+                addDeliveryBtn.disabled = true;
+
+                addDeliveryBtn.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+
+
+                deliveryStatus.textContent =
+                    "Saving delivery...";
+
+                deliveryStatus.style.color =
+                    "#64748b";
+
+
+
+                try {
+
+
+                    const response =
+                        await fetch(
+                            "/api/deliveries",
+                            {
+
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body: JSON.stringify({
+
+                                    customer_name:
+                                        customerName,
+
+                                    phone:
+                                        phone,
+
+                                    address:
+                                        address,
+
+                                    city:
+                                        city,
+
+                                    pincode:
+                                        pincode,
+
+                                    instructions:
+                                        instructions
+
+                                })
+
+                            }
+                        );
+
+
+
+                    const result =
+                        await response.json();
+
+
+
+                    if (result.success) {
+
+
+                        deliveryStatus.textContent =
+                            "✅ " + result.message +
+                            " Delivery ID: " +
+                            result.delivery_id;
+
+                        deliveryStatus.style.color =
+                            "green";
+
+
+                        deliveryForm.reset();
+
+
+                        addDeliveryBtn.innerHTML =
+                            '<i class="fa-solid fa-check"></i> Added';
+
+
+                        setTimeout(function() {
+
+                            addDeliveryBtn.disabled =
+                                false;
+
+                            addDeliveryBtn.innerHTML =
+                                '<i class="fa-solid fa-plus"></i> Add Delivery';
+
+                        }, 2000);
+
+
+                    }
+
+                    else {
+
+
+                        deliveryStatus.textContent =
+                            "❌ " + result.message;
+
+                        deliveryStatus.style.color =
+                            "red";
+
+
+                        addDeliveryBtn.disabled =
+                            false;
+
+                        addDeliveryBtn.innerHTML =
+                            '<i class="fa-solid fa-plus"></i> Add Delivery';
+
+                    }
+
+
+                }
+
+                catch (error) {
+
+
+                    console.error(error);
+
+
+                    deliveryStatus.textContent =
+                        "❌ Could not connect to the Flask server.";
+
+                    deliveryStatus.style.color =
+                        "red";
+
+
+                    addDeliveryBtn.disabled =
+                        false;
+
+                    addDeliveryBtn.innerHTML =
+                        '<i class="fa-solid fa-plus"></i> Add Delivery';
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
